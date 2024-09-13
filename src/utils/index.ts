@@ -61,7 +61,7 @@ export const joinPaths = (...paths: string[]): string => {
 export const updatePackageJson = (destinationPath: string, projectName: string) => {
   try {
     const packageJsonPath = path.join(destinationPath, 'package.json');
-    const packageJson = JSON.parse(fs.readFileSync(`./${packageJsonPath}`, 'utf-8'));
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
 
     // Update the project name in package.json
     packageJson.name = projectName;
@@ -83,8 +83,8 @@ export const updatePackageJson = (destinationPath: string, projectName: string) 
  */
 export const updateIndexHtml = (destinationPath: string, projectName: string) => {
   try {
-    const indexPath = path.join(destinationPath, 'index.html');
-    let indexHtml = fs.readFileSync(`./${indexPath}`, 'utf-8');
+    let indexPath = path.join(destinationPath, 'index.html')
+    let indexHtml = fs.readFileSync(indexPath, 'utf-8')
 
     // Replace the <title> tag with the new project name
     indexHtml = indexHtml.replace(/<title>.*<\/title>/, `<title>${projectName}</title>`);

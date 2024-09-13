@@ -23,10 +23,11 @@ export const askProjectDetails = async () => {
     {
       type: 'input',
       name: 'path',
-      message: 'Path:',
+      message: 'Path (if empty, current directory):',
       default: './',
       validate: (input) => {
-        if (!fs.existsSync(input)) return 'Invalid path.'
+        const validPathRegex = /^([a-zA-Z0-9]|\.\/|\/|\.\.\/)[a-zA-Z0-9/]*$/;
+        if (!validPathRegex.test(input)) return 'Invalid path'
         return true
       } 
     },
