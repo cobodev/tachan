@@ -1,4 +1,5 @@
 import inquirer from "inquirer";
+import fs from 'fs';
 import { getListFromPath, joinPaths } from "../utils";
 
 /**
@@ -14,12 +15,20 @@ export const askProjectDetails = async () => {
       name: 'name',
       message: 'Project name:',
       default: 'my-first-app',
+      validate: (input) => {
+        if (input.includes(' ')) return 'Invalid project name.'
+        return true
+      }
     },
     {
       type: 'input',
       name: 'path',
       message: 'Path:',
       default: './',
+      validate: (input) => {
+        if (!fs.existsSync(input)) return 'Invalid path.'
+        return true
+      } 
     },
   ]);
 };

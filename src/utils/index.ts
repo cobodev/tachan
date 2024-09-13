@@ -50,3 +50,49 @@ export const copyTemplate = (src: string, dest: string): void => {
 export const joinPaths = (...paths: string[]): string => {
   return path.join(...paths);
 };
+
+/**
+ * Updates the "name" field in the package.json file located at the destination path.
+ * 
+ * @param {string} destinationPath - The path to the directory containing the package.json file.
+ * @param {string} projectName - The new name to set in the package.json file.
+ * @returns {void}
+ */
+export const updatePackageJson = (destinationPath: string, projectName: string) => {
+  try {
+    const packageJsonPath = path.join(destinationPath, 'package.json');
+    const packageJson = JSON.parse(fs.readFileSync(`./${packageJsonPath}`, 'utf-8'));
+
+    // Update the project name in package.json
+    packageJson.name = projectName;
+
+    // Write the updated package.json back to the file
+    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf-8');
+    console.log(`Nombre de la aplicación actualizado a "${projectName}" en package.json`);
+  } catch (error: any) {
+    console.error(`Error actualizando package.json: ${error.message}`);
+  }
+};
+
+/**
+ * Updates the title tag in the index.html file located at the destination path.
+ * 
+ * @param {string} destinationPath - The path to the directory containing the index.html file.
+ * @param {string} projectName - The new title to set in the index.html file.
+ * @returns {void}
+ */
+export const updateIndexHtml = (destinationPath: string, projectName: string) => {
+  try {
+    const indexPath = path.join(destinationPath, 'index.html');
+    let indexHtml = fs.readFileSync(`./${indexPath}`, 'utf-8');
+
+    // Replace the <title> tag with the new project name
+    indexHtml = indexHtml.replace(/<title>.*<\/title>/, `<title>${projectName}</title>`);
+
+    // Write the updated index.html back to the file
+    fs.writeFileSync(indexPath, indexHtml, 'utf-8');
+    console.log(`Título actualizado a "${projectName}" en index.html`);
+  } catch (error: any) {
+    console.error(`Error actualizando index.html: ${error.message}`);
+  }
+};

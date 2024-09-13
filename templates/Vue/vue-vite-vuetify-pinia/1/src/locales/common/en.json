@@ -1,0 +1,35 @@
+{
+  "menu": {
+    "items": {
+      "home": "Home",
+      "about": "About",
+      "components": "Components"
+    },
+    "descriptions": {
+      "home": "Página de inicio",
+      "about": "Sobre la aplicación",
+      "components": "Ejemplos de componentes"
+    }
+  },
+  "common": {
+    "example": {
+      "hello": "Hello world!",
+      "welcome": "Welcome {name}",
+      "chooseOpts": "Here you have two options: {0} and {1}",
+      "linked": "Message linked with... @:common.example.hello",
+      "pluralization": "no apples | one apple | {count} apples",
+      "more": "More about i18n module @.lower:common.example.here",
+      "here": "Here"
+    },
+    "dialog": {
+      "confirmation": "Confirmation"
+    },
+    "buttons": {
+      "accept": "Accept",
+      "cancel": "Cancel"
+    },
+    "msg": {
+      "logout": "Are you sure you want to log out?"
+    }
+  }
+}

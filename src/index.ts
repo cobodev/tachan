@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { copyTemplate, joinPaths } from './utils';
+import { copyTemplate, joinPaths, updateIndexHtml, updatePackageJson } from './utils';
 import { askFramework, askProjectDetails, askTemplateDetails } from './prompts';
 
 const init = async (): Promise<void> => {
@@ -13,6 +13,8 @@ const init = async (): Promise<void> => {
     const templatePath = joinPaths(templatesPath, framework.framework, templateDetails.template, templateDetails.version);
     const destinationPath = joinPaths(projectDetails.path, projectDetails.name);
     copyTemplate(templatePath, destinationPath);
+    updatePackageJson(destinationPath, projectDetails.name)
+    updateIndexHtml(destinationPath, projectDetails.name)
 
     console.log(`Project "${projectDetails.name}" has been created at ${destinationPath}`);
   } catch (error: any) {
