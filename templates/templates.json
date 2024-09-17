@@ -1,0 +1,14 @@
+{
+  "astro": {
+    "midudev-portfolio": "https://github.com/midudev/porfolio.dev"
+  },
+  "react": {
+    "vite-react-basics": "",
+    "portfolio": ""
+  },
+  "vue": {
+    "basic-frontend": ""
+  },
+  "angular": {},
+  "svelte": {}
+}

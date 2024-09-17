@@ -1,6 +1,4 @@
 import inquirer from "inquirer";
-import fs from 'fs';
-import { getListFromPath, joinPaths } from "../utils";
 
 /**
  * Prompts the user to input project details, such as the project name and path.
@@ -16,8 +14,8 @@ export const askProjectDetails = async () => {
       message: 'Project name:',
       default: 'my-first-app',
       validate: (input) => {
-        if (input.includes(' ')) return 'Invalid project name.'
-        return true
+        if (input.includes(' ')) return 'Invalid project name.';
+        return true;
       }
     },
     {
@@ -27,21 +25,21 @@ export const askProjectDetails = async () => {
       default: './',
       validate: (input) => {
         const validPathRegex = /^([a-zA-Z0-9]|\.\/|\/|\.\.\/)[a-zA-Z0-9/]*$/;
-        if (!validPathRegex.test(input)) return 'Invalid path'
-        return true
+        if (!validPathRegex.test(input)) return 'Invalid path';
+        return true;
       } 
     },
   ]);
-};
+}
 
 /**
- * Prompts the user to select a framework from the available choices in a given path.
+ * Prompts the user to select a framework from the available templates.
  * 
- * @param {string} path - The path where the frameworks are located.
- * @returns {Promise<Object>} A promise that resolves with the selected framework.
+ * @param {Object} templates - An object containing available frameworks as keys.
+ * @returns {Promise<Object>} A promise that resolves with the user's selected framework.
  */
-export const askFramework = async (path: string) => {
-  const choices = getListFromPath(path);
+export const askFramework = async (templates: any) => {
+  const choices = Object.keys(templates);
   return inquirer.prompt([
     {
       type: 'list',
@@ -53,37 +51,36 @@ export const askFramework = async (path: string) => {
 }
 
 /**
- * Prompts the user to select a template and a version for a given technology.
+ * Prompts the user to select a specific template within the chosen framework.
  * 
- * @param {string} techsPath - The base path where the templates for the selected technology are stored.
- * @param {string} selectedTech - The selected technology for which templates are available.
- * @returns {Promise<Object>} A promise that resolves with the selected template and version details.
+ * @param {Object} templates - An object containing available templates for a specific framework.
+ * @returns {Promise<Object>} A promise that resolves with the user's selected template.
  */
-export const askTemplateDetails = async (techsPath: string, selectedTech: string) => {
-  const techTemplatesPath = joinPaths(techsPath, selectedTech);
-
-  const templateChoices = getListFromPath(techTemplatesPath);
-  const templateAnswers = await inquirer.prompt([
+export const askTemplateDetails = async (templates: any) => {
+  const choices = Object.keys(templates);
+  return await inquirer.prompt([
     {
       type: 'list',
       name: 'template',
       message: 'What template would you like to use?',
-      choices: templateChoices,
+      choices,
     },
   ]);
+}
 
-  const versionChoices = getListFromPath(joinPaths(techTemplatesPath, templateAnswers.template));
-  const versionAnswers = await inquirer.prompt([
+/**
+ * Prompts the user to confirm the project creation details.
+ * 
+ * @param {string} template - The selected template for the project.
+ * @param {string} projectName - The name of the project to be created.
+ * @returns {Promise<Object>} A promise that resolves with the user's confirmation (true/false).
+ */
+export const askConfirm = async (template: string, projectName: string) => {
+  return await inquirer.prompt([
     {
-      type: 'list',
-      name: 'version',
-      message: 'What version would you like to use?',
-      choices: versionChoices,
-    },
+      type: 'confirm',
+      name: 'confirm',
+      message: `Are you sure you want to create project ${projectName} with template ${template}?`
+    }
   ]);
-
-  return {
-    template: templateAnswers.template,
-    version: versionAnswers.version,
-  };
-};
+}

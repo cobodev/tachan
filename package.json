@@ -18,7 +18,9 @@
   "author": "Jose Luis Cobo",
   "license": "ISC",
   "dependencies": {
-    "inquirer": "10.2.2"
+    "chalk": "^4.0.0",
+    "inquirer": "10.2.2",
+    "simple-git": "^3.26.0"
   },
   "devDependencies": {
     "@types/inquirer": "9.0.7",

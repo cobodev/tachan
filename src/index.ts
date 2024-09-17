@@ -1,25 +1,39 @@
 #!/usr/bin/env node
-import { copyTemplate, joinPaths, updateIndexHtml, updatePackageJson } from './utils';
-import { askFramework, askProjectDetails, askTemplateDetails } from './prompts';
+import { cloneTemplate, joinPaths, updateIndexHtml, updatePackageJson } from './utils'
+import { askConfirm, askFramework, askProjectDetails, askTemplateDetails } from './prompts'
+import { bold, error, success } from './messages';
+import fs from 'fs'
 
 const init = async (): Promise<void> => {
   try {
-    const templatesPath = joinPaths(__dirname, '../templates')
+    // get template list
+    const templates = JSON.parse(fs.readFileSync(`${__dirname}/../templates/templates.json`, 'utf-8'))
 
-    const projectDetails = await askProjectDetails();
-    const framework = await askFramework(templatesPath);
-    const templateDetails = await askTemplateDetails(templatesPath, framework.framework);
+    // questions
+    const projectDetails = await askProjectDetails()
+    const framework = await askFramework(templates)
+    const template = await askTemplateDetails(templates[framework.framework])
+    const confirmation = await askConfirm(template.template, projectDetails.name)
 
-    const templatePath = joinPaths(templatesPath, framework.framework, templateDetails.template, templateDetails.version);
-    const destinationPath = joinPaths(projectDetails.path, projectDetails.name);
-    copyTemplate(templatePath, destinationPath);
+    // confirm
+    if (!confirmation.confirm) {
+      error('Project setup cancelled.')
+      process.exit(0);
+    }
+
+    // clone template to path
+    const templateUrl = templates[framework.framework][template.template]
+    const destinationPath = joinPaths(projectDetails.path, projectDetails.name)
+    await cloneTemplate(templateUrl, destinationPath)
+    
+    // update project name
     updatePackageJson(destinationPath, projectDetails.name)
     updateIndexHtml(destinationPath, projectDetails.name)
-
-    console.log(`Project "${projectDetails.name}" has been created at ${destinationPath}`);
+    
+    success(`Project "${bold(projectDetails.name)}" has been created at ${bold(destinationPath)}`)
   } catch (error: any) {
-    console.error(`Error creating project: ${error.message}`);
+    error('Error creating project:', error.message)
   }
-};
+}
 
-init();
+init()

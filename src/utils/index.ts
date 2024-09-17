@@ -1,45 +1,25 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'fs'
+import path from 'path'
+import simpleGit from 'simple-git'
+import { bold, error, info } from '../messages'
 
 /**
- * Reads and returns the list of files and directories from the specified path.
+ * Clones a Git repository template into a specified destination directory.
  * 
- * @param {string} dirPath - The directory path to read from.
- * @returns {string[]} An array of file and directory names in the specified path.
- * If the path is not found or an error occurs, it returns an empty array.
+ * @param url - The URL of the Git repository to clone.
+ * @param dest - The destination path where the repository should be cloned.
+ * @returns A promise that resolves when the cloning process completes.
  */
-export const getListFromPath = (dirPath: string): string[] => {
+export const cloneTemplate = async (url: string, dest: string) => {
+  const git = simpleGit();
   try {
-    return fs.readdirSync(dirPath);
+    info(`Cloning template from ${bold(url)} into ${bold(dest)}...`);
+    await git.clone(url, dest);
+    info('Template cloned.');
   } catch (err: any) {
-    console.error(`Error reading directory: ${err.message}`);
-    return [];
+    error('Error cloning template:', err.message);
   }
-};
-
-/**
- * Recursively copies files and directories from the source path to the destination path.
- * 
- * @param {string} src - The source path where the files and directories are located.
- * @param {string} dest - The destination path where files and directories should be copied to.
- */
-export const copyTemplate = (src: string, dest: string): void => {
-  if (!fs.existsSync(dest)) {
-    fs.mkdirSync(dest, { recursive: true });
-  }
-
-  const items = fs.readdirSync(src);
-  items.forEach((item) => {
-    const srcPath = path.join(src, item);
-    const destPath = path.join(dest, item);
-
-    if (fs.statSync(srcPath).isDirectory()) {
-      copyTemplate(srcPath, destPath);
-    } else {
-      fs.copyFileSync(srcPath, destPath);
-    }
-  });
-};
+}
 
 /**
  * Joins multiple path segments into a single path string.
@@ -48,7 +28,21 @@ export const copyTemplate = (src: string, dest: string): void => {
  * @returns {string} The final joined path.
  */
 export const joinPaths = (...paths: string[]): string => {
-  return path.join(...paths);
+  return path.join(...paths)
+}
+
+/**
+ * Checks if a given path exists.
+ * 
+ * @param path - The file or directory path to check.
+ * @returns - A boolean indicating whether the path exists.
+ */
+export const checkPathExists = (path: string): boolean => {
+  try {
+    return fs.existsSync(path);
+  } catch (err) {
+    return false;
+  }
 };
 
 /**
@@ -60,19 +54,21 @@ export const joinPaths = (...paths: string[]): string => {
  */
 export const updatePackageJson = (destinationPath: string, projectName: string) => {
   try {
-    const packageJsonPath = path.join(destinationPath, 'package.json');
-    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+    const packageJsonPath = joinPaths(destinationPath, 'package.json')
+    if (!checkPathExists(packageJsonPath)) return;
+
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'))
 
     // Update the project name in package.json
-    packageJson.name = projectName;
+    packageJson.name = projectName
 
     // Write the updated package.json back to the file
-    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf-8');
-    console.log(`Nombre de la aplicación actualizado a "${projectName}" en package.json`);
+    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf-8')
+    info(`Application name updated to "${bold(projectName)}" in package.json`)
   } catch (error: any) {
-    console.error(`Error actualizando package.json: ${error.message}`);
+    error('Error updating package.json:', error.message)
   }
-};
+}
 
 /**
  * Updates the title tag in the index.html file located at the destination path.
@@ -83,16 +79,18 @@ export const updatePackageJson = (destinationPath: string, projectName: string) 
  */
 export const updateIndexHtml = (destinationPath: string, projectName: string) => {
   try {
-    let indexPath = path.join(destinationPath, 'index.html')
+    let indexPath = joinPaths(destinationPath, 'index.html')
+    if (!checkPathExists(indexPath)) return;
+
     let indexHtml = fs.readFileSync(indexPath, 'utf-8')
 
     // Replace the <title> tag with the new project name
-    indexHtml = indexHtml.replace(/<title>.*<\/title>/, `<title>${projectName}</title>`);
+    indexHtml = indexHtml.replace(/<title>.*<\/title>/, `<title>${projectName}</title>`)
 
     // Write the updated index.html back to the file
-    fs.writeFileSync(indexPath, indexHtml, 'utf-8');
-    console.log(`Título actualizado a "${projectName}" en index.html`);
+    fs.writeFileSync(indexPath, indexHtml, 'utf-8')
+    info(`Application title updated to "${bold(projectName)}" in index.html`)
   } catch (error: any) {
-    console.error(`Error actualizando index.html: ${error.message}`);
+    error('Error updating index.html:', error.message)
   }
-};
+}
